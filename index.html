@@ -1478,7 +1478,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
   /* ---------- Smooth scroll ---------- */
   let lenis = null;
   if (MOTION && window.Lenis) {
-    lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+    lenis = new Lenis({ lerp: 0.075, smoothWheel: true, wheelMultiplier: 0.9 });
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((t) => lenis.raf(t * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -1535,6 +1535,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
         const im = new Image();
         im.decoding = 'async';
         im.src = asset(seqPath(name, i));
+        if (im.decode) im.decode().catch(() => {});
         im.onload = () => { if (i === Math.round(want) || cur < 0) draw(want, true); };
         frames[i] = im;
       }
@@ -1593,7 +1594,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     { no: 628, x: '8%', y: '12%', w: 'clamp(160px, 21vw, 340px)' },
     { no: 666, x: '60%', y: '62%', w: 'clamp(180px, 26vw, 420px)' },
   ];
-  const FINDS = [357, 658, 16, 628, 495, 656, 666, 273];
+  const FINDS = [20203, 20050, 20208, 20045, 20102, 20122, 20090, 20212];
   const PHRASES = ['A little bit of everything', 'New find', 'Clever little thing', 'Made everyday easier', 'Worth discovering', 'Just arrived'];
 
   function bandsBlock() {
@@ -1664,7 +1665,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
         <div class="feel__static"><p class="h1">New. Clever. Useful. Unexpected. Fun.</p><p class="display" style="margin-top:24px">I didn't know I needed this.</p></div>
       </section>
       <section class="section finds" id="finds" aria-labelledby="findsTitle">
-        <div class="finds__head"><div><h2 class="h1" id="findsTitle">${finds.length ? 'First finds.' : 'New finds are on their way.'}</h2><p class="lede" style="margin-top:18px">${finds.length ? 'A few of the hundreds of things coming to TUTTO. Prices coming soon.' : "We're unpacking hundreds of them right now. Check back soon."}</p></div><a class="btn btn--teal" href="#/shop">Go to the shop</a></div>
+        <div class="finds__head"><div><h2 class="h1" id="findsTitle">${finds.length ? 'Christmas picks.' : 'New finds are on their way.'}</h2><p class="lede" style="margin-top:18px">${finds.length ? 'A few favourites from our Christmas collection.' : "We're unpacking hundreds of them right now. Check back soon."}</p></div><a class="btn btn--teal" href="#/shop">Go to the shop</a></div>
         <div class="grid">${finds.length ? finds.map(productCard).join('') : mixed.join('')}</div>
       </section>
       <section class="section teaser" aria-labelledby="storyTitle">
@@ -1696,8 +1697,8 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     let box = { x: 0, y: 0, w: 1, h: 1 }, dpr = 1, sMax = 16, raf = 0;
     const queue = () => { if (!raf) raf = requestAnimationFrame(render); };
     const ok = (im) => im && im.complete && im.naturalWidth;
-    const logo = new Image(); logo.decoding = 'async'; logo.onload = queue; logo.src = asset('brand/logo/tutto-logo-3d-hd.webp');
-    for (let i = 0; i < N; i++) { const im = new Image(); im.decoding = 'async'; im.onload = () => { if (Math.abs(i - st.f) < 2 || i === 0) queue(); }; im.src = asset(seqPath('interior', i)); frames.push(im); }
+    const logo = new Image(); logo.decoding = 'async'; logo.onload = queue; logo.src = asset('brand/logo/tutto-logo-3d-hd.webp'); if (logo.decode) logo.decode().then(queue).catch(() => {});
+    for (let i = 0; i < N; i++) { const im = new Image(); im.decoding = 'async'; im.onload = () => { if (Math.abs(i - st.f) < 2 || i === 0) queue(); }; im.src = asset(seqPath('interior', i)); if (im.decode) im.decode().catch(() => {}); frames.push(im); }
     function frameAt(f) {
       const i = Math.max(0, Math.min(N - 1, Math.round(f)));
       if (ok(frames[i])) return frames[i];
@@ -1746,7 +1747,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
         const x0 = Math.max(0, Lx), y0 = Math.max(0, Ly), x1 = Math.min(vw, Lx + Lw), y1 = Math.min(vh, Ly + Lh);
         if (x1 > x0 && y1 > y0) {
           const sx = logo.naturalWidth / Lw, sy = logo.naturalHeight / Lh;
-          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+          ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = st.s > 2.5 ? 'medium' : 'high';
           ctx.drawImage(logo, (x0 - Lx) * sx, (y0 - Ly) * sy, (x1 - x0) * sx, (y1 - y0) * sy, x0, y0, x1 - x0, y1 - y0);
         }
       }
@@ -1766,7 +1767,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
       if (p > 0.004 && !vid.paused) { vid.pause(); vid.currentTime = 0; }
       else if (p <= 0.004 && vid.paused) vid.play().catch(() => {});
     };
-    const tl = gsap.timeline({ scrollTrigger: { trigger: dive, start: 'top top', end: 'bottom bottom', scrub: 0.5, invalidateOnRefresh: true, onUpdate: (s) => park(s.progress) } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: dive, start: 'top top', end: 'bottom bottom', scrub: 1, invalidateOnRefresh: true, onUpdate: (s) => park(s.progress) } });
     tl.to(['#under', '#cue'], { opacity: 0, y: -18, duration: 0.05, ease: 'none' }, 0)
       .to(vid, { opacity: 0, duration: 0.05, ease: 'none' }, 0.02)
       .to(st, { k: 1, duration: 0.3, ease: 'power2.inOut', onUpdate: queue }, 0.05)
@@ -1819,7 +1820,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     const R = [-6, 4, -3, 6, -5, 3, -6], Y = [16, -8, 8, -14, 10, -4, 14];
     const dx = (c) => table.clientWidth / 2 - (c.offsetLeft + c.offsetWidth / 2);
     // explicit start and end values (a .from() would re-record its end values on refresh)
-    const tl = gsap.timeline({ scrollTrigger: { trigger: deal, start: 'top top', end: '+=120%', pin: true, scrub: 0.6, invalidateOnRefresh: true, anticipatePin: 1 } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: deal, start: 'top top', end: '+=120%', pin: true, scrub: 0.9, invalidateOnRefresh: true, anticipatePin: 1 } });
     tl.fromTo(cards,
       { x: (i, c) => dx(c), y: (i) => 70 - i * 6, rotation: (i) => [-14, 9, -5, 15, -10, 6, -16][i % 7], scale: 0.84 },
       { x: 0, y: (i) => Y[i % 7], rotation: (i) => R[i % 7], scale: 1, duration: 1, ease: 'power3.inOut', stagger: { each: 0.05, from: 'end' } })
@@ -1831,7 +1832,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     flyby($('#plane'), aisle, { start: 'top bottom', end: 'top top', bob: -18, rot: 4 });
     if (!aisle || !MOTION || isSmall()) return;
     const dist = () => Math.max(0, track.scrollWidth - innerWidth);
-    gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: aisle, start: 'top top', end: () => '+=' + dist(), pin: true, scrub: 0.7, invalidateOnRefresh: true, anticipatePin: 1 } });
+    gsap.to(track, { x: () => -dist(), ease: 'none', scrollTrigger: { trigger: aisle, start: 'top top', end: () => '+=' + dist(), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1 } });
     $$('.dept__ring', track).forEach((r, i) => gsap.fromTo(r, { rotate: -12 }, { rotate: 12, ease: 'none', scrollTrigger: { trigger: aisle, start: 'top top', end: () => '+=' + dist(), scrub: true } }));
   }
 
@@ -1843,7 +1844,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     const bgs = ['#6ABDAE', '#EC5E51', '#E9B75A', '#292826', '#6ABDAE'];
     const fgs = ['#292826', '#F4F1E9', '#292826', '#F4F1E9', '#292826'];
     gsap.set(line, { opacity: 0, y: 40 });
-    const tl = gsap.timeline({ scrollTrigger: { trigger: feel, start: 'top top', end: '+=520%', pin: true, scrub: 0.5 } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: feel, start: 'top top', end: '+=520%', pin: true, scrub: 0.9 } });
     words.forEach((w, i) => {
       const t = i * 1;
       tl.set(feel, { backgroundColor: bgs[i] }, t)
@@ -1870,7 +1871,7 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     if (!MOTION) { seq.load(); seq.size(); seq.draw(NF - 1, true); return; }
     ScrollTrigger.create({ trigger: preloadFrom || visit, start: 'top bottom+=600', once: true, onEnter: () => { seq.load(); seq.size(); } });
     gsap.set('#visitCopy', { opacity: 0, y: 40 });
-    const tl = gsap.timeline({ scrollTrigger: { trigger: visit, start: 'top top', end: '+=220%', pin: true, scrub: 0.5, onRefresh: () => seq.size() } });
+    const tl = gsap.timeline({ scrollTrigger: { trigger: visit, start: 'top top', end: '+=220%', pin: true, scrub: 0.9, onRefresh: () => seq.size() } });
     tl.to(st, { f: NF - 1, duration: 1, ease: 'none', onUpdate: () => seq.draw(st.f) }, 0)
       .to('#visitCopy', { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.62);
   }
