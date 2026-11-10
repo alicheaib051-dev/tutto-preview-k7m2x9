@@ -1464,9 +1464,13 @@ window.__COUNTER_PATH__ = "<path d=\"M0 0 C2.7 3.7 2.7 3.7 5 8 C6.9 10.7 8.9 13.
     if (!BUNDLE) return p;
     if (_urls[p]) return _urls[p];
     const e = BUNDLE[p]; if (!e) return p;
-    const bin = atob(e[1]), u8 = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
-    return (_urls[p] = URL.createObjectURL(new Blob([u8], { type: e[0] })));
+    // images (and anything non-video) as data: URLs, so they show even where blob: URLs are blocked (previews, in-app browsers)
+    if (!/^video\//.test(e[0])) return (_urls[p] = `data:${e[0]};base64,${e[1]}`);
+    try {
+      const bin = atob(e[1]), u8 = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      return (_urls[p] = URL.createObjectURL(new Blob([u8], { type: e[0] })));
+    } catch (_) { return (_urls[p] = `data:${e[0]};base64,${e[1]}`); }
   }
   const SEQ_N = window.__SEQ_N__ || { interior: 97, 'facade-day-night': 97 };
   const seqPath = (name, i) => `sequences/${name}/${window.__SEQ_DIR__ || (isSmall() ? 640 : 1280)}/${String(i + 1).padStart(4, '0')}.webp`;
